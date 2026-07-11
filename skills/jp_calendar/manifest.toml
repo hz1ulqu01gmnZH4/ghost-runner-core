@@ -1,0 +1,6 @@
+name = "jp_calendar"
+version = "0.1.0"
+description = "西暦の日付を和暦(元号)と曜日に変換する。入力: {\"date\": \"YYYY-MM-DD\"}"
+timeout_s = 5.0
+sha256 = "4f9da27be59de85dddaa50513937e93c60a574045a821296c1fc1bb6f6a2e30c"
+provenance = "human:ak"

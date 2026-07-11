@@ -1,0 +1,6 @@
+name = "text_stats"
+version = "0.1.0"
+description = "テキストの文字統計(総文字数・ひらがな・カタカナ・漢字)。入力: {\"text\": \"...\"}"
+timeout_s = 5.0
+sha256 = "b534b69e8faa93c2d9703b5189b4c3619566b95795b2a290c801deeba210f038"
+provenance = "human:ak"

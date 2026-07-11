@@ -1,0 +1,28 @@
+[project]
+name = "ghost-runner-core"
+version = "0.1.0"
+description = "Ghost Runner backend brain: WebSocket protocol v1 server, turn orchestration, priority LLM scheduling over llama-server"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "websockets>=15.0",
+    "openai>=1.60",
+]
+
+[project.scripts]
+ghost-runner-core = "ghost_runner_core.main:cli"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.25",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+asyncio_default_fixture_loop_scope = "function"
+
+[build-system]
+requires = ["uv_build>=0.11.26,<0.12.0"]
+build-backend = "uv_build"

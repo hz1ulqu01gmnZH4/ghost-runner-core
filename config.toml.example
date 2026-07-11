@@ -1,0 +1,28 @@
+# ghost-runner-core configuration (M0).
+# Copy to config.toml and adjust. Unknown keys are startup errors by design.
+
+[server]
+bind = "127.0.0.1"          # non-loopback binds REQUIRE auth_token_file (§A7.6)
+port = 8790
+# auth_token_file = "~/.ghost-runner/token"
+
+[llm]
+base_url = "http://127.0.0.1:8080/v1"   # llama-server (or llama-swap) front door
+model = "Qwen3.6-27B-UD-Q4_K_XL_MTP.gguf"
+# system_prompt = "..."     # defaults to the JA-first companion prompt in config.py
+# history_messages = 20
+
+[memory]
+db = "~/.ghost-runner/ghost.db"
+
+[asr]                        # optional: omit to disable voice input
+server_url = "http://127.0.0.1:8081"    # whisper.cpp whisper-server
+language = "ja"
+
+[skills]                     # optional: omit to disable skill.list/skill.run
+dir = "~/ghost-runner-core/skills"
+
+[tts]                        # optional: omit to disable speech output
+server_url = "http://127.0.0.1:8088"
+engine = "irodori"           # "irodori" (Irodori-TTS-Server) or "fish" (S2 Pro api_server)
+# voice = "none"             # irodori only: reference-voice id from its voices/ dir
