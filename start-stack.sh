@@ -93,16 +93,52 @@ start() {
     say "stack is up — client connects to ws://localhost:8790"
 }
 
+find_pids() { # find_pids <name> — pidfile first, else match the launch command.
+    # Pattern matches may include wrapper shells around the real binary; every
+    # match is stopped and awaited, so a wrapper can never shield its child.
+    local name=$1 pid
+    pid=$(cat "$RUN_DIR/$name.pid" 2>/dev/null || true)
+    if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then echo "$pid"; return; fi
+    case "$name" in # tight patterns incl. port so unrelated servers never match
+        llama)   pgrep -f -- "llama-server.*--port 8080" ;;
+        whisper) pgrep -f -- "whisper-server.*--port 8081" ;;
+        irodori) pgrep -f -- "irodori.openai.tts" ;;
+        core)    pgrep -f -- "ghost_runner_core.main" ;;
+    esac || true
+}
+
 stop() {
+    # Reverse dependency order: core first (clients get a clean close), the
+    # model servers last. SIGTERM only — a component that won't die is
+    # reported, never forced (kill -9 hides whatever is wedging it).
+    local failed=0
     for name in core irodori whisper llama; do
-        pid=$(cat "$RUN_DIR/$name.pid" 2>/dev/null || true)
-        if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
-            say "$name: stopping (pid $pid)"
-            kill "$pid"
-        else
-            say "$name: not running (no live pid)"
+        local pids
+        pids=$(find_pids "$name")
+        if [ -z "$pids" ]; then
+            say "$name: not running"
+            continue
         fi
+        say "$name: stopping (pid $(echo "$pids" | tr '\n' ' '))"
+        # shellcheck disable=SC2086
+        kill $pids 2>/dev/null || true
+        local waited=0 alive
+        while :; do
+            alive=""
+            for pid in $pids; do
+                kill -0 "$pid" 2>/dev/null && alive="$alive $pid"
+            done
+            [ -z "$alive" ] && break
+            if [ "$waited" -ge 30 ]; then
+                say "ERROR: $name (pid$alive) still alive 30s after SIGTERM — investigate before forcing"
+                failed=1
+                break
+            fi
+            sleep 1; waited=$((waited + 1))
+        done
+        [ "$waited" -lt 30 ] && say "$name: stopped"
     done
+    return "$failed"
 }
 
 status() {
