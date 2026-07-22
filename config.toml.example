@@ -25,4 +25,9 @@ dir = "~/ghost-runner-core/skills"
 [tts]                        # optional: omit to disable speech output
 server_url = "http://127.0.0.1:8088"
 engine = "irodori"           # "irodori" (Irodori-TTS-Server) or "fish" (S2 Pro api_server)
-# voice = "none"             # irodori only: reference-voice id from its voices/ dir
+# voice = "none"             # irodori only: reference-voice id from its voices/ dir.
+                             # Design/clone workflow: tools/fish_sample_voices.py samples
+                             # speaker styles from fish S2 Pro, tools/design_voice.py warps
+                             # pitch/formants, tools/promote_voice.py pins the clip you
+                             # actually liked as the reference (audition outputs drift from
+                             # their reference — promote what you HEARD, not the source).
